@@ -49,6 +49,10 @@ val env_set_range (g:env) (r:range) : g':env{g==g'}
 val env_set_context (g:env) (ctx:context) : g':env{g==g'}
 val embed_st_term_for_extraction (d:'a) (r:option range): T.term
 val unembed_st_term_for_extraction (d:T.term) : 'a
+// Frontend-private observation after Pulse checking and before compression or
+// erasure. Observation alone is not a proof certificate: the complete compiler
+// invocation must still finish successfully before an exporter publishes code.
+val observe_checked_term (name:R.name) (typ body:T.term) : T.Tac unit
 val unembed_pulse_decl (d:'a) : 'b
 module R = FStar.Reflection.V2
 val push_univ_vars (g: env) (us: list R.univ_name) : g':env { g' == g }

@@ -77,6 +77,20 @@ let embed_st_term_for_extraction (d:'a) r =
    U.mk_lazy d S.tun (S.Lazy_extension "pulse_st_term") r
 let unembed_st_term_for_extraction (d:S.term) : 'a =
    U.unlazy_as_t (S.Lazy_extension "pulse_st_term") d
+(* This private hook deliberately observes the live, checked term. The ordinary
+   deep compressor unfolds an extension lazy node into a display placeholder;
+   checked-file metadata therefore cannot supply this body to a later exporter. *)
+type checked_term_observer = string list -> S.term -> S.term -> unit
+let checked_term_observer : checked_term_observer option ref = ref None
+let register_checked_term_observer observer =
+   match !checked_term_observer with
+   | Some _ -> failwith "a checked Pulse observer is already installed"
+   | None -> checked_term_observer := Some observer
+let observe_checked_term name typ body : unit utac =
+   fun _ps ->
+      match !checked_term_observer with
+      | None -> ()
+      | Some observe -> observe name typ body
 let unembed_pulse_decl (d:'a) : 'b =
    U.unlazy_as_t (S.Lazy_extension "pulse_decl") (Obj.magic d)
 
